@@ -125,7 +125,7 @@
   "enter_content": "내용을 입력하세요",
   "enter_title_content": "제목과 내용을 모두 입력해주세요.",
   "no_login_info": "로그인 정보가 없습니다.",
-  "login_required": "로그인이 필요한 기능이에요",
+  "login_required": "로그인하면 페플의 모든 기능을 이용할 수 있어요",
   "login_required_title": "로그인이 필요해요",
   "post_success": "게시글이 성공적으로 등록되었습니다.",
   "post_failed": "게시글 등록에 실패했습니다.",

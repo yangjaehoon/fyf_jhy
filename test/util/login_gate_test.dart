@@ -144,6 +144,8 @@ void main() {
       await tester.tap(find.text('tap'), warnIfMissed: false);
       await tester.pumpAndSettle();
 
+      // 확인 버튼은 다이얼로그 인스턴스당 유일한 키라, 하나만 잡히면 다이얼로그도
+      // 하나만 떠 있다는 뜻이다.
       expect(confirmButton, findsOneWidget);
 
       await tester.tap(confirmButton);
