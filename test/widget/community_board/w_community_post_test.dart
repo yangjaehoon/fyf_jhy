@@ -181,6 +181,8 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.edit_rounded));
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('login_gate_confirm')));
+      await tester.pumpAndSettle();
 
       expect(find.byType(LoginScreen), findsOneWidget);
     });
