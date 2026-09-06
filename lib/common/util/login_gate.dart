@@ -6,12 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // 로그인 유도(확인 다이얼로그 + 로그인 화면)는 루트 네비게이터 기준 앱 전체에
-// 하나만 진행돼야 한다 — 위젯별 상태가 아니라 모듈 전역 가드. 좋아요/팔로우
-// 버튼을 빠르게 연속 탭하는 등 앞선 호출이 끝나기 전에 다시 불려도 이 플래그로
-// 다이얼로그·화면이 겹쳐 뜨는 것을 막는다. pop을 기다리지 않고 다음 프레임에
-// 바로 풀어준다 — 그 프레임부터는 다이얼로그/화면이 원래 버튼을 덮어 재탭이
-// 불가능하고, dismiss 없이 트리가 교체되는 경우에도 가드가 영구히 막히지 않도록.
+// 하나만 진행돼야 한다 — 위젯별 상태가 아니라 모듈 전역 가드.
 bool _loginFlowActive = false;
+
+// 가드를 세우고, 다음 프레임에 바로 푼다. 그 프레임부터는 다이얼로그/화면이
+// 원래 버튼을 덮어 재탭이 불가능하고, dismiss 없이 트리가 교체되는 경우에도
+// 가드가 영구히 막히지 않는다. 따라서 실질적으로 막는 것은 "첫 프레임이 그려지기
+// 전, 같은 배치에서 ensureLoggedIn/openLoginScreen이 중복 호출되는" 경우다.
+void _beginLoginFlow() {
+  _loginFlowActive = true;
+  WidgetsBinding.instance.addPostFrameCallback((_) => _loginFlowActive = false);
+}
 
 /// 로그인 화면을 루트 네비게이터에 push한다. 게스트 유도 지점 여러 곳에서
 /// 반복되던 코드 — 항상 이 헬퍼를 쓴다.
@@ -21,12 +26,10 @@ bool _loginFlowActive = false;
 /// 유도가 진행 중이면 `false`.
 Future<bool> openLoginScreen(BuildContext context) async {
   if (_loginFlowActive) return false;
-  _loginFlowActive = true;
-  final pushed = Navigator.of(context, rootNavigator: true).push<bool>(
+  _beginLoginFlow();
+  final loggedIn = await Navigator.of(context, rootNavigator: true).push<bool>(
     MaterialPageRoute(builder: (_) => const LoginScreen()),
   );
-  WidgetsBinding.instance.addPostFrameCallback((_) => _loginFlowActive = false);
-  final loggedIn = await pushed;
   return loggedIn ?? false;
 }
 
@@ -42,15 +45,13 @@ Future<bool> ensureLoggedIn(BuildContext context) async {
   if (context.read<UserProvider>().currentUserId != null) return true;
   if (_loginFlowActive) return false;
 
-  _loginFlowActive = true;
-  WidgetsBinding.instance.addPostFrameCallback((_) => _loginFlowActive = false);
-
+  _beginLoginFlow();
   final confirmed = await showConfirmDialog(
     context,
     title: 'login_required_title'.tr(),
     content: 'login_required'.tr(),
     confirmLabel: 'login'.tr(),
-    confirmColor: context.appColors.activate,
+    destructive: false,
     confirmKey: const Key('login_gate_confirm'),
   );
   if (!confirmed || !context.mounted) return false;
