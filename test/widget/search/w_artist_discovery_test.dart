@@ -216,6 +216,8 @@ void main() {
 
       await tester.tap(find.text('artist_suggestion_banner'.tr()));
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('login_gate_confirm')));
+      await tester.pumpAndSettle();
 
       expect(find.byType(LoginScreen), findsOneWidget);
     });

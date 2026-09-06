@@ -181,7 +181,13 @@ void main() {
       await pump(tester, photoId: 1);
 
       await tester.tap(find.byIcon(Icons.favorite_border_rounded));
-      await tester.pumpAndSettle();
+      // 뷰어 배경 애니메이션이 계속 돌고 확인 다이얼로그는 불투명 라우트가 아니라
+      // pumpAndSettle이 멈추지 않으므로 고정 프레임으로 진행한다.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byKey(const Key('login_gate_confirm')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.byType(LoginScreen), findsOneWidget);
       verifyNever(() => mockService.toggleLike(any(), any()));

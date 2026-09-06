@@ -243,7 +243,13 @@ void main() {
       await pump(tester, poster: _poster(id: 1));
 
       await tester.tap(find.byIcon(Icons.favorite_border_rounded));
-      await tester.pumpAndSettle();
+      // 포스터 썸네일의 SkeletonBox가 계속 반짝이고 확인 다이얼로그는 불투명
+      // 라우트가 아니라 pumpAndSettle이 멈추지 않으므로 고정 프레임으로 진행한다.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byKey(const Key('login_gate_confirm')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.byType(LoginScreen), findsOneWidget);
       expect(find.byIcon(Icons.favorite_rounded), findsNothing);
@@ -306,7 +312,13 @@ void main() {
       await pump(tester, poster: _poster(id: 1));
 
       await tester.tap(find.text('action_cert'.tr()));
-      await tester.pumpAndSettle();
+      // 포스터 썸네일의 SkeletonBox가 계속 반짝이고 확인 다이얼로그는 불투명
+      // 라우트가 아니라 pumpAndSettle이 멈추지 않으므로 고정 프레임으로 진행한다.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byKey(const Key('login_gate_confirm')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.byType(LoginScreen), findsOneWidget);
       expect(find.byType(CertificationBottomSheet), findsNothing);
