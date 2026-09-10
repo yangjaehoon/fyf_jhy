@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   analyze:
     name: Flutter Analyze
@@ -20,9 +23,12 @@ jobs:
           cache: true
 
       - name: Restore secret files
+        env:
+          KEYS_DART: ${{ secrets.KEYS_DART }}
+          CONFIG_DART: ${{ secrets.CONFIG_DART }}
         run: |
-          echo "${{ secrets.KEYS_DART }}" > lib/auth/keys.dart
-          echo "${{ secrets.CONFIG_DART }}" > lib/config.dart
+          echo "$KEYS_DART" > lib/auth/keys.dart
+          echo "$CONFIG_DART" > lib/config.dart
 
       - run: flutter pub get
 
@@ -41,9 +47,12 @@ jobs:
           cache: true
 
       - name: Restore secret files
+        env:
+          KEYS_DART: ${{ secrets.KEYS_DART }}
+          CONFIG_DART: ${{ secrets.CONFIG_DART }}
         run: |
-          echo "${{ secrets.KEYS_DART }}" > lib/auth/keys.dart
-          echo "${{ secrets.CONFIG_DART }}" > lib/config.dart
+          echo "$KEYS_DART" > lib/auth/keys.dart
+          echo "$CONFIG_DART" > lib/config.dart
 
       - run: flutter pub get
 
